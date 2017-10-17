@@ -2,6 +2,7 @@
  * Created by ChitSwe on 12/20/16.
  */
 const Preference = {
+    supressBackNavigation:false,
     format: {
         currency: {
             symbol: "MMK", // default currency symbol is '$'

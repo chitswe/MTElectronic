@@ -75,9 +75,15 @@ class LandingPage extends React.Component{
             >
               <Image source={{uri}} style={[styles.linkImage,{width:viewportWidth,height:viewportWidth}]}/>
             </TouchableOpacity>)}
-
+          ListFooterComponent={
+            ()=>{
+              return (
+                <FontDetector showFontWidth={false} onDetected={this.forceUpdate.bind(this)}/>
+              );
+            }
+          }
         />
-        <FontDetector showFontWidth={false} onDetected={this.forceUpdate.bind(this)}/>
+
         {loading?<ActivityIndicator style={styles.loading} size="large" animating={loading}/>:null}
       </View>
     );

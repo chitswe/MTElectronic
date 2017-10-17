@@ -9,25 +9,15 @@ class CategoryFlatList extends React.Component{
     return (
       <View>
         {
-          ProductGroup && ProductGroup.length>0?
-          <Text style={styles.title}>Sub Categories</Text>
-          :
-          null
-        }
-        {
           ProductGroup && ProductGroup.length>0 ?
-          <Card
-            title={null}
-            containerStyle={styles.card}
-          >
             <FlatList
+              contentContainerStyle={styles.groupListContainer}
               data={ProductGroup}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               keyExtractor={(group,index)=>(group.id)}
               renderItem={item=>(<CategoryCard dataItem={item} navigation={navigation}/>)}
             />
-          </Card>
           :
           null
         }
@@ -45,10 +35,9 @@ const styles=StyleSheet.create({
     color:'#000',
     fontFamily:fontStyles.FiaSansR.fontFamily
   },
-  card:{
-    marginHorizontal:0,
-    marginVertical:0,
-    padding:8
+  groupListContainer:{
+    padding:16,
+    paddingBottom:0,
   }
 });
 export default CategoryFlatList;

@@ -4,6 +4,7 @@ import {TouchableOpacity,StyleSheet,FlatList,View,Text,Dimensions,ActivityIndica
 import { Icon,Avatar,Card } from 'react-native-elements'
 import immutableUpdate from 'react-addons-update';
 import fontStyles from './FontStyle';
+import Preference from '../Preferences';
 const windowDimension = Dimensions.get('window');
 class FilterModalBox extends React.Component{
   constructor(){
@@ -12,6 +13,9 @@ class FilterModalBox extends React.Component{
       selectedFilter:{PossibleValue:[]},
       selectedValue:{}
     };
+  }
+  componentDidMount(){
+    Preference.supressBackNavigation = true;
   }
   _renderFilterListItem({item}){
     const {IconUrl,Name,PossibleValue} = item;
@@ -84,7 +88,7 @@ class FilterModalBox extends React.Component{
     const {selectedFilter,selectedValue} = this.state;
     const {PossibleValue} = selectedFilter? selectedFilter:{PossibleValue:[]};
     return (<Modal
-              backdropPressToClose={true}
+              backButtonClose={true}
               swipeArea={50}
               style={styles.modal}
               isOpen={isOpen}

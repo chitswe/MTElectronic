@@ -7,6 +7,7 @@ import SearchScreen from './search';
 import CategoryBrowserScreen from './category_browser';
 import ProductBrowserScreen from './browser';
 import CategoryTreeScreen from './CategoryTree';
+import Preference from './Preferences';
 import {
   StackNavigator,
   addNavigationHelpers
@@ -57,6 +58,10 @@ class MainNavigator extends React.Component{
   componentDidMount(){
     BackHandler.addEventListener('backPress',()=>{
       const { dispatch, mainNavigator,homeNavigator } = this.props
+      if(Preference.supressBackNavigation){
+        Preference.supressBackNavigation = false;
+        return true;
+      }
       if (this.__shouldCloseApp([mainNavigator,homeNavigator]))
         return false;
       dispatch({ type: 'Navigation/BACK' })

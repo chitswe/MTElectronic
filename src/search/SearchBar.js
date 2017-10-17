@@ -5,6 +5,10 @@ import {connect} from 'react-redux';
 
 class SearchBar extends React.Component{
   onChangeText(search){
+    this.searchText = search;
+  }
+  onBlur(e){
+    let search =this.searchText;
     let words=[];
     if(search){
       words = search.split(' ');
@@ -32,7 +36,7 @@ class SearchBar extends React.Component{
           style={styles.header}
         >
           <TouchableOpacity style={styles.backTouchable} onPress={()=>{navigation.goBack();}}><Icon containerStyle={styles.headerIcon} color="#fff" type={Platform.select({ios:'ionicon',android:'material'})} name={Platform.select({ios:'ios-arrow-back',android:'arrow-back'})}/></TouchableOpacity>
-          <SearchBox  onChangeText={this.onChangeText.bind(this)} clearIcon={{name:'clear'}} containerStyle={styles.searchBox} inputStyle={styles.searchBoxInputStyle} placeholder="Search product..." lightTheme={true}/>
+          <SearchBox returnKeyLabel="search" onChangeText={this.onChangeText.bind(this)}  onBlur={this.onBlur.bind(this)} clearIcon={{name:'clear'}} containerStyle={styles.searchBox} inputStyle={styles.searchBoxInputStyle} placeholder="Search product..." lightTheme={true}/>
         </View>
         <View style={styles.content}>
         </View>

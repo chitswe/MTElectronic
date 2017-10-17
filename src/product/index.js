@@ -24,10 +24,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import AvailabilityLabel from './AvailabilityLabel';
 import MMHTMLView from '../common/MMHTMLView';
 import RelatedProductList from './RelatedProductList';
-const NAVBAR_HEIGHT = 64;
+const STATUS_BAR_HEIGHT = Platform.select({ ios: 20, android: StatusBar.currentHeight });
+const NAVBAR_HEIGHT = 64 + STATUS_BAR_HEIGHT;
 const HEADER_MAX_HEIGHT = viewportWidth-32;
 const HEADER_MIN_HEIGHT =0;
-const STATUS_BAR_HEIGHT = Platform.select({ ios: 20, android: 0 });
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
 class ProductViewer extends React.Component{
@@ -50,7 +50,7 @@ class ProductViewer extends React.Component{
             offsetAnim,
           ),
           0,
-          NAVBAR_HEIGHT - STATUS_BAR_HEIGHT,
+          NAVBAR_HEIGHT ,
         )
     };
   }
@@ -70,7 +70,7 @@ class ProductViewer extends React.Component{
       this._scrollValue = value;
       this._clampedScrollValue = Math.min(
         Math.max(this._clampedScrollValue + diff, 0),
-        NAVBAR_HEIGHT - STATUS_BAR_HEIGHT,
+        NAVBAR_HEIGHT ,
       );
     });
     this.state.offsetAnim.addListener(({ value }) => {
@@ -93,7 +93,7 @@ class ProductViewer extends React.Component{
 
   _onMomentumScrollEnd = () => {
     const toValue = this._scrollValue > NAVBAR_HEIGHT &&
-      this._clampedScrollValue > (NAVBAR_HEIGHT - STATUS_BAR_HEIGHT) / 2
+      this._clampedScrollValue > (NAVBAR_HEIGHT ) / 2
       ? this._offsetValue + NAVBAR_HEIGHT
       : this._offsetValue - NAVBAR_HEIGHT;
 
@@ -153,8 +153,8 @@ class ProductViewer extends React.Component{
     const { activeSlide, sliderRef,clampedScroll } = this.state;
     const {state:{params:{title}}} = navigation;
     const navbarTranslate = clampedScroll.interpolate({
-      inputRange: [0, NAVBAR_HEIGHT - STATUS_BAR_HEIGHT],
-      outputRange: [0, -(NAVBAR_HEIGHT - STATUS_BAR_HEIGHT)],
+      inputRange: [0, NAVBAR_HEIGHT ],
+      outputRange: [0, -(NAVBAR_HEIGHT )],
       extrapolate: 'clamp',
     });
     const headerTranslate = this.state.scrollY.interpolate({
@@ -179,20 +179,30 @@ class ProductViewer extends React.Component{
       outputRange: [0, 100],
       extrapolate: 'clamp',
     });
-
+    const onScroll=Animated.event(
+      [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
+      { useNativeDriver: false },
+    );
     return (
       <View style={{flex:1,backgroundColor:'#fff'}}>
       <StatusBar
         animated={true}
-         backgroundColor="#f44336"
+        translucent={true}
+        backgroundColor="rgba(0,0,0,0)"
+        barStyle='light-content'
        />
       <Animated.ScrollView
         style={styles.fill}
         scrollEventThrottle={1}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
-          { useNativeDriver: false },
-        )}
+        onScroll={event=>{
+          onScroll(event);
+          const {nativeEvent:{contentOffset:{y}}}= event;
+          if(y> HEADER_MAX_HEIGHT){
+            StatusBar.setBackgroundColor("rgba(244,67,54,1)");
+          }else {
+            StatusBar.setBackgroundColor("rgba(0,0,0,0)")
+          }
+        }}
       >
         {this._renderScrollViewContent()}
       </Animated.ScrollView>
@@ -250,8 +260,9 @@ class ProductViewer extends React.Component{
         </Animated.View>
       </Animated.View>
       <Animated.View style={[styles.bar,{backgroundColor:'transparent',transform: [{ translateY: navbarTranslate }]}]}>
-        <LinearGradient colors={['rgba(0,0,0,.5)', 'rgba(0,0,0,0)']} style={styles.bar}>
-          <Animated.View style={[styles.bar,{backgroundColor:navBarBackground}]}>
+        <LinearGradient colors={['rgba(0,0,0,.5)', 'rgba(0,0,0,0)']} style={[styles.bar]}>
+          <Animated.View style={[styles.barOffset,{backgroundColor:navBarBackground}]}/>
+          <Animated.View style={[styles.bar,{height:NAVBAR_HEIGHT - STATUS_BAR_HEIGHT,top:STATUS_BAR_HEIGHT},{backgroundColor:navBarBackground}]}>
             <Header
                 leftComponent={<TouchableOpacity onPress={()=>{navigation.goBack();}}><Icon containerStyle={styles.headerIcon} color="#fff" type={Platform.select({ios:'ionicon',android:'material'})} name={Platform.select({ios:'ios-arrow-back',android:'arrow-back'})}/></TouchableOpacity>}
                 centerComponent={<MMText style={{color:'#fff'}}>{title}</MMText>}
@@ -328,6 +339,15 @@ const styles=StyleSheet.create({
     height: NAVBAR_HEIGHT,
     justifyContent: 'center',
   },
+  barOffset:{
+    position:'absolute',
+    top:0,
+    left:0,
+    right:0,
+    alignItems:'center',
+    justifyContent:'center',
+    height:STATUS_BAR_HEIGHT
+  },
   scrollViewContent: {
     marginTop: HEADER_MAX_HEIGHT,
     backgroundColor:'#e3e3e3'
@@ -356,7 +376,8 @@ const styles=StyleSheet.create({
     margin:0
   },
   headerIcon:{
-    paddingHorizontal:12
+    paddingHorizontal:12,
+    paddingVertical:8,
   }
 });
 
